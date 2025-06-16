@@ -1,0 +1,5 @@
+Flask
+requests
+gunicorn
+beautifulsoup4
+urllib3

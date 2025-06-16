@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Tra cứu điểm thi THPT 2025</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #a1866f, #704214);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      position: relative;
+    }
+
+    .iframe-logo {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 150px;
+      height: 100px;
+      border: none;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      background-color: #8b4513;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #5c3317;
+    }
+
+    #ketQua {
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.3);
+      padding: 10px;
+      border-radius: 8px;
+      color: #000;
+    }
+
+    .copyright {
+      position: absolute;
+      bottom: 10px;
+      text-align: center;
+      width: 100%;
+      font-size: 13px;
+      color: #f3e5dc;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Iframe thay ảnh góc trái -->
+  <iframe class="iframe-logo" 
+    src="https://drive.google.com/file/d/1M4HBeFyqFi8VyGxKGeKD-93ZD8bwXHOw/preview" 
+    allow="autoplay">
+  </iframe>
+
+  <div class="container">
+    <h2>Tra cứu điểm thi THPT 2025</h2>
+    <form id="formTraCuu">
+      <label for="sbd">Số báo danh:</label>
+      <input type="text" id="sbd" placeholder="Ví dụ: 63001234" required>
+      <button type="submit">Tra cứu</button>
+    </form>
+    <div id="ketQua">Kết quả sẽ hiển thị ở đây...</div>
+  </div>
+
+  <div class="copyright"> © 2025 KHO ĐỀ AZOTA. All rights reserved..</div>
+
+<script>
+  let serverReady = false;
+
+  // Kiểm tra máy chủ Vietnamnet khi trang vừa mở
+  fetch("/ping-vietnamnet")
+    .then(res => res.json())
+    .then(data => {
+      const statusDiv = document.getElementById("serverStatus");
+      if (data.ok) {
+        serverReady = true;
+        statusDiv.innerHTML = "✅ Máy chủ sẵn sàng.";
+        statusDiv.style.color = "lightgreen";
+      } else {
+        serverReady = false;
+        statusDiv.innerHTML = "🚫 Không thể kết nối máy chủ.";
+        statusDiv.style.color = "red";
+      }
+    })
+    .catch(() => {
+      const statusDiv = document.getElementById("serverStatus");
+      serverReady = false;
+      statusDiv.innerHTML = "⚠️ Lỗi kiểm tra máy chủ Vietnamnet.";
+      statusDiv.style.color = "orange";
+    });
+
+  // Bắt sự kiện submit form tra cứu
+  document.getElementById("formTraCuu").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const sbd = document.getElementById("sbd").value.trim();
+    const ketQua = document.getElementById("ketQua");
+
+    if (!serverReady) {
+      ketQua.innerHTML = "❌ Máy chủ chưa sẵn sàng. Vui lòng thử lại sau.";
+      return;
+    }
+
+    if (!sbd) {
+      ketQua.innerHTML = "⚠️ Vui lòng nhập số báo danh hợp lệ.";
+      return;
+    }
+
+    ketQua.innerHTML = "🔍 Đang tra cứu...";
+
+    fetch(`/tra-cuu?sbd=${encodeURIComponent(sbd)}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          ketQua.innerHTML = data.result;
+        } else {
+          ketQua.innerHTML = "❌ Không tìm thấy kết quả. Vui lòng kiểm tra số báo danh.";
+        }
+      })
+      .catch(() => {
+        ketQua.innerHTML = "❗ Có lỗi xảy ra. Vui lòng thử lại sau.";
+      });
+  });
+</script>
+</body>
+</html>
